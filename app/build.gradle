@@ -1,13 +1,5 @@
 apply plugin: 'com.android.application'
 android {
-    signingConfigs {
-        config {
-            keyAlias '377237868'
-            keyPassword '377237868'
-            storeFile file('D:/Downloads/IE9 Downloads/Note 3/Android Studio/MyKey/MyKey.jks')
-            storePassword '377237868'
-        }
-    }
     compileSdkVersion 23
     buildToolsVersion '23.0.2'
     defaultConfig {
@@ -15,14 +7,11 @@ android {
         minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0"
-        signingConfig signingConfigs.config
-    }
+        versionName "1.0"    }
     buildTypes {
         release {
             minifyEnabled true
             //  proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
             zipAlignEnabled true
             debuggable false
             jniDebuggable false
@@ -30,7 +19,6 @@ android {
         debug {
             debuggable true
             jniDebuggable true
-            signingConfig signingConfigs.config
             renderscriptDebuggable true
             minifyEnabled false
             zipAlignEnabled true
