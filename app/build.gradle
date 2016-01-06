@@ -1,0 +1,51 @@
+apply plugin: 'com.android.application'
+android {
+    signingConfigs {
+        config {
+            keyAlias '377237868'
+            keyPassword '377237868'
+            storeFile file('D:/Downloads/IE9 Downloads/Note 3/Android Studio/MyKey/MyKey.jks')
+            storePassword '377237868'
+        }
+    }
+    compileSdkVersion 23
+    buildToolsVersion '23.0.2'
+    defaultConfig {
+        applicationId "bg.nijel.aGrep"
+        minSdkVersion 21
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        signingConfig signingConfigs.config
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            //  proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+            zipAlignEnabled true
+            debuggable false
+            jniDebuggable false
+        }
+        debug {
+            debuggable true
+            jniDebuggable true
+            signingConfig signingConfigs.config
+            renderscriptDebuggable true
+            minifyEnabled false
+            zipAlignEnabled true
+        }
+    }
+    productFlavors {
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+
+dependencies {
+    //compile fileTree(dir: 'libs', include: ['*.jar'])
+   // testCompile 'junit:junit:4.12'
+    // compile 'me.grantland:autofittextview:0.2.1'
+}

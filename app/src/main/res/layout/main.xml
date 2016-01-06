@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/ButtonHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="0dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/history"
+            android:tint="#FF727272" />
+
+        <AutoCompleteTextView
+            android:id="@+id/EditText01"
+            android:layout_width="0.0dip"
+            android:layout_height="48dp"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_weight="1.0"
+            android:inputType="none"
+            android:completionThreshold="1"
+            android:hint="@string/label_hint"
+            android:imeOptions="actionSearch|flagNoExtractUi"
+            android:paddingBottom="0dp"
+            android:paddingTop="0dp"
+            android:singleLine="true" />
+
+        <ImageButton
+            android:id="@+id/ButtonSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="0dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/search"
+            android:tint="#FF727272" />
+
+        <ImageButton
+            android:id="@+id/ButtonClear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="0dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/clr"
+            android:tint="#FF727272" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#10727272"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/checkmatchwholeword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_match_whole"
+            android:textSize="16.0sp" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <CheckBox
+            android:id="@+id/checkmatchcase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_ignore_case"
+            android:textSize="16.0sp" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <CheckBox
+            android:id="@+id/checkre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_re"
+            android:textSize="16.0sp" />
+
+        <Space
+            android:layout_width="15px"
+            android:layout_height="0dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|left"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1.0"
+            android:text="@string/label_ext"
+            android:textSize="18.0sp"
+            android:textStyle="italic" />
+
+        <Button
+            android:id="@+id/addext"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|right"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="0dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:text="ADD"
+            android:textColor="#ff009688" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="40dip"
+        android:background="#10727272"
+        android:fadeScrollbars="true"
+        android:fillViewport="false"
+        android:measureAllChildren="false"
+        android:scrollbarSize="3dp"
+        android:scrollbars="horizontal">
+
+        <LinearLayout
+            android:id="@+id/listext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:divider="?android:dividerVertical"
+            android:orientation="horizontal"
+            android:paddingTop="4.0dip"
+            android:showDividers="middle" />
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0.0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|left"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1.0"
+            android:text="@string/label_dir"
+            android:textSize="18.0sp"
+            android:textStyle="italic" />
+
+        <Button
+            android:id="@+id/adddir"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|right"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="0dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:text="ADD"
+            android:textColor="#ff009688" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#10727272"
+        android:fadeScrollbars="true"
+        android:scrollbarSize="2dp">
+
+        <LinearLayout
+            android:id="@+id/listdir"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:divider="?android:dividerHorizontal"
+            android:orientation="vertical"
+            android:paddingLeft="8.0dip"
+            android:paddingRight="8.0dip"
+            android:showDividers="middle|end" />
+    </ScrollView>
+
+</LinearLayout>
