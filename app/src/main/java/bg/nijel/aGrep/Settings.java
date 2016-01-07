@@ -35,6 +35,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import bg.nijel.aGrep.DialogChooseDirectory.Result;
+import bg.nijel.aGrep.utils.AutoComleteDropDownAdapter;
 
 public class Settings extends Activity implements Result {
 
@@ -81,7 +82,7 @@ public class Settings extends Activity implements Result {
                 final CheckedString strItem = (CheckedString) view.getTag();
                 // Show Dialog
                 new AlertDialog.Builder(mContext)
-                .setTitle(R.string.label_remove_item_title)
+                .setTitle(strItem.string)
                 .setMessage( getString(R.string.label_remove_item , strItem ) )
                 .setPositiveButton(R.string.label_OK, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -105,7 +106,7 @@ public class Settings extends Activity implements Result {
                 final CheckedString strItem = (CheckedString) view.getTag();
                 // Show Dialog
                 new AlertDialog.Builder(mContext)
-                .setTitle(R.string.label_remove_item_title)
+                .setTitle(strText)
                 .setMessage( getString(R.string.label_remove_item , strText ) )
                 .setPositiveButton(R.string.label_OK, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -283,8 +284,9 @@ public class Settings extends Activity implements Result {
                 return false;
             }
         });
-        mRecentAdapter = new ArrayAdapter<String>(mContext, R.layout.recents_row, new ArrayList<String>());
+        mRecentAdapter = new AutoComleteDropDownAdapter<>(mContext, R.layout.recents_row, new ArrayList<String>());
         edittext.setAdapter(mRecentAdapter);
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         ImageButton clrBtn = (ImageButton) findViewById(R.id.ButtonClear);
         clrBtn.setOnClickListener(new OnClickListener() {
@@ -318,20 +320,22 @@ public class Settings extends Activity implements Result {
                 }
             }
         });
-
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         ImageButton historyBtn = (ImageButton) findViewById(R.id.ButtonHistory);
         historyBtn.setOnClickListener(new OnClickListener() {
-            public void onClick(View view)
-            {
-                edittext.showDropDown();
-            }
-        });
+            public void onClick(View view) {
+                if (mPrefs.getRecent(mContext).size() > 0){
+                    edittext.showDropDown();
+                }else {
+                    Toast.makeText(mContext, "No recent history...", Toast.LENGTH_LONG).show();
+                }
+        }
+    });
         setActionBarTile();
     }
     
     public void onChooseDirectory(String dir) {
         if (dir != null && dir.length()>0 ) {
-                // 二重チェック
                 for( CheckedString t : mPrefs.mDirList ){
                     if ( t.string.equalsIgnoreCase(dir)){
                         return;
@@ -355,7 +359,7 @@ public class Settings extends Activity implements Result {
                 return object1.string.compareToIgnoreCase(object2.string);
             }
         });
-        for( CheckedString s : list ){
+        for (CheckedString s : list ){
             CheckBox v = (CheckBox)View.inflate(this, R.layout.list_dir, null);
             if (s.string.equals("*no_ext")){
                 v.setText(R.string.label_no_extension);
@@ -375,42 +379,6 @@ public class Settings extends Activity implements Result {
     }
     private void refreshExtList() {
         setListItem(mExtListView, mPrefs.mExtList, mExtListener, mCheckListener);
-    }
-
-    private void removeRecentItem(){
-
-        final List<String> recent = mPrefs.getRecent(mContext);
-        String item;
-        for (int i = 0; i < recent.size(); i++){
-            item = recent.get(i);
-            if (mRecentAdapter.getItem(i).equals(item)){
-                recent.remove(item);
-                mRecentAdapter.remove(item);
-                mRecentAdapter.notifyDataSetChanged();
-            }
-        }
-
-
-
-
-
-      /*  final CheckedString strItem = (CheckedString) view.getTag();
-        // Show Dialog
-        new AlertDialog.Builder(mContext)
-                .setTitle(R.string.label_remove_item_title)
-                .setMessage( getString(R.string.label_remove_item , strItem ) )
-                .setPositiveButton(R.string.label_OK, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        mPrefs.mDirList.remove(strItem);
-                        refreshDirList();
-                        mPrefs.savePrefs(mContext);
-                    }
-                })
-                .setNegativeButton(R.string.label_CANCEL, null )
-                .setCancelable(true)
-                .show();
-        return true;*/
-
     }
 
     @Override
@@ -457,11 +425,10 @@ public class Settings extends Activity implements Result {
            // }
       //  }
     }
-
+//**************************************************************************************************************************************************************************************
     @Override
     protected void onResume() {
         super.onResume();
-
         final List<String> recent = mPrefs.getRecent(mContext);
         mRecentAdapter.clear();
         mRecentAdapter.addAll(recent);

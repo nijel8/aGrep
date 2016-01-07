@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import java.util.WeakHashMap;
 
+import bg.nijel.aGrep.R;
+
 /**
  * A {@link ViewGroup} that re-sizes the text of it's children to be no larger than the width of the
  * view.

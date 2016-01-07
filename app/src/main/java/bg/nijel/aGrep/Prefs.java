@@ -182,8 +182,9 @@ public class Prefs
         editor.apply();
     }
 
-    public void reAddRecents(Context context , String searchWord, Long timeadded){
-
+    public static void removeRecentItem(Context context , String searchWord){
+        final SharedPreferences sp = context.getSharedPreferences(PREF_RECENT, Context.MODE_PRIVATE);
+        sp.edit().remove(searchWord).apply();
     }
 
     public List<String> getRecent(Context context)

@@ -14,8 +14,8 @@
     <string name="label_ADD">Add</string>
     <string name="label_OK">OK</string>
     <string name="label_CANCEL">Cancel</string>
-    <string name="label_remove_item_title">Remove item</string>
-    <string name="label_remove_item">"%s\n\nAre you sure?"</string>
+    <string name="label_remove_item_title">%s</string>
+    <string name="label_remove_item">Remove item?</string>
     <string name="label_no_target_dir">"Add target directory…"</string>
     <string name="menu_viewer">View</string>
     <string name="grep_spinner">Searching for…</string>

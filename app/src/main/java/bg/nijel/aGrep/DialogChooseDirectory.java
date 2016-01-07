@@ -34,7 +34,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
     AlertDialog m_alertDialog;
     Context m_context;
     File m_currentDir;
-    List<File> m_entries = new ArrayList();
+    List<File> m_entries = new ArrayList<>();
     ListView m_list;
     Result m_result = null;
     private Prefs mPrefs;
@@ -96,6 +96,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
         });
     }
 
+    @SuppressWarnings("deprecation")
     public DialogChooseDirectory(Context ctx, Result res, String startDir) {
         this.m_context = ctx;
         this.m_result = res;
@@ -144,7 +145,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
         } else {
             this.title.setTextAppearance(android.R.style.TextAppearance_Material_Title);
         }
-        this.title.setCompoundDrawables(scaleDrawable(DialogChooseDirectory.this.m_context.getResources().getDrawable(R.drawable.folder_add), 90, 90), null, null, null);
+        this.title.setCompoundDrawables(scaleDrawable(DialogChooseDirectory.this.m_context.getResources().getDrawable(R.drawable.folder_add, null), 90, 90), null, null, null);
         AutofitHelper.create(this.title);
         builder.setCustomTitle(this.title);
         m_alertDialog = builder.create();
