@@ -155,7 +155,7 @@ public class ColorPickerPreference
         paint1.setAntiAlias(true);
         canvas1.drawARGB(0, 0, 0, 0);
         paint1.setColor(color);
-        canvas1.drawCircle(bmrec.getWidth() / 2, bmrec.getHeight() / 2, (bmrec.getWidth() - (int)((float)4 * mDensity)) / 2, paint1);
+        canvas1.drawCircle(bmrec.getWidth() / 2, bmrec.getHeight() / 2, (bmrec.getWidth() - (int)(mDensity * 4)) / 2, paint1);
         paint1.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas1.drawBitmap(bmcir, rect1, rect1, paint1);
         return bmcir;
