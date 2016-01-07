@@ -47,4 +47,8 @@
     <string name="search_aborted">No files found matching search criteria. Search aborted…</string>
     <string name="grep_aborted">Text not found in selected files…</string>
     <string name="search_text_empty">Search query is empty…</string>
+    
+    <!-- Color Picker -->
+    <string name="dialog_color_picker">Color Picker</string>
+    <string name="press_color_to_apply">Press on Color to apply</string>
 </resources>

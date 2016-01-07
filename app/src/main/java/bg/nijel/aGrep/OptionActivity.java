@@ -1,7 +1,6 @@
 package bg.nijel.aGrep;
 
 import android.app.ActionBar;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -15,6 +14,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.stericson.RootShell.RootShell;
+
+import net.margaritov.preference.colorpicker.ColorPickerPreference;
 
 import bg.nijel.aGrep.utils.FriendlyEditTextPreference;
 
@@ -48,19 +49,13 @@ public class OptionActivity extends PreferenceActivity {
 
         sp.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                Preference pref;
+                /*Preference pref;
                 if (key.equals(Prefs.KEY_HIGHLIGHTFG)) {
                     pref = findPreference(key);
                     if (pref != null) {
                         pref.setSummary(setHighlightPreferenceSummary(REQUEST_CODE_HIGHLIGHT));
                     }
-                }
-                if (key.equals(Prefs.KEY_HIGHLIGHTBG)) {
-                    pref = findPreference(key);
-                    if (pref != null) {
-                        pref.setSummary(setHighlightPreferenceSummary(REQUEST_CODE_BACKGROUND));
-                    }
-                }
+                }*/
                 if (key.equals(Prefs.KEY_DEBUG)) {
                     CheckBoxPreference debug = (CheckBoxPreference) findPreference(key);
                     if (debug.isChecked()) {
@@ -84,18 +79,29 @@ public class OptionActivity extends PreferenceActivity {
             mPs.addPreference(pr);
         }
 
-        createHighlightPreference(R.string.label_highlight_fg, REQUEST_CODE_HIGHLIGHT);
-        createHighlightPreference(R.string.label_highlight_bg, REQUEST_CODE_BACKGROUND);
-
-        /*{
-            final AmbilWarnaPreference pr = new AmbilWarnaPreference(this, null);
-            pr.setKey("some_color");
-            pr.setTitle("Some color");
-            pr.setSummary("some color");
-            pr.setDefaultValue(0xff009688);
-            pr.alphaEnabled(true);
+        {
+            //Add text highlight foreground color
+            final ColorPickerPreference pr = new ColorPickerPreference(this);
+            pr.setKey(Prefs.KEY_HIGHLIGHTFG);
+            pr.setTitle(R.string.label_highlight_fg);
+            pr.setSummary("Set text foreground color.");
+            pr.setDefaultValue(0xFFFFFFFF);
+            pr.setAlphaSliderEnabled(true);
+            pr.setHexValueEnabled(true);
             mPs.addPreference(pr);
-        }*/
+        }
+
+        {
+            //Add text highlight background color
+            final ColorPickerPreference pr = new ColorPickerPreference(this);
+            pr.setKey(Prefs.KEY_HIGHLIGHTBG);
+            pr.setTitle(R.string.label_highlight_bg);
+            pr.setSummary("Set text background color.");
+            pr.setDefaultValue(0xFF009688);
+            pr.setAlphaSliderEnabled(true);
+            pr.setHexValueEnabled(true);
+            mPs.addPreference(pr);
+        }
 
         {
             // Add Linenumber
@@ -160,63 +166,6 @@ public class OptionActivity extends PreferenceActivity {
         mDpref.setTitle(R.string.label_debug_tag);
         mDpref.getEditText().setHint(R.string.summary_debug_hint);
         mDpref.setDialogTitle(R.string.label_debug_tag);
-    }
-
-    private void createHighlightPreference( final int resid , final int reqCode )
-    {
-        final Preference pr = new Preference(this);
-        if(reqCode == REQUEST_CODE_HIGHLIGHT){
-            pr.setKey(Prefs.KEY_HIGHLIGHTFG);
-        }
-        if(reqCode == REQUEST_CODE_BACKGROUND){
-            pr.setKey(Prefs.KEY_HIGHLIGHTBG);
-        }
-        pr.setTitle(resid);
-        pr.setSummary(setHighlightPreferenceSummary(reqCode));
-
-        pr.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
-                Intent intent = new Intent( OptionActivity.this , ColorPickerActivity.class );
-                intent.putExtra(ColorPickerActivity.EXTRA_TITLE, getString(resid));
-                startActivityForResult(intent, reqCode);
-                return true;
-            }
-        });
-
-        mPs.addPreference(pr);
-    }
-
-    private String setHighlightPreferenceSummary (int requestCode){
-        String summary = "";
-        switch (requestCode){
-            case REQUEST_CODE_HIGHLIGHT:
-                summary = "Set found text foreground color. Current: " + String.format("#%06X", 0xFFFFFF & mPrefs.mHighlightFg);
-                break;
-            case REQUEST_CODE_BACKGROUND:
-                summary = "Set found text background color. Current: " + String.format("#%06X", 0xFFFFFF & mPrefs.mHighlightBg);
-                break;
-        }
-        return summary;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if ( resultCode == RESULT_OK ){
-            int color = data.getIntExtra(ColorPickerActivity.EXTRA_COLOR, 0x009688);
-            if ( requestCode == REQUEST_CODE_HIGHLIGHT ){
-                mPrefs.mHighlightFg = color;
-            }else if ( requestCode == REQUEST_CODE_BACKGROUND ){
-                mPrefs.mHighlightBg = color;
-            }
-            final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-            sp.edit()
-            .putInt(Prefs.KEY_HIGHLIGHTFG, mPrefs.mHighlightFg)
-            .putInt(Prefs.KEY_HIGHLIGHTBG, mPrefs.mHighlightBg)
-            .apply();
-        }
-        onResume();
     }
 
     @Override

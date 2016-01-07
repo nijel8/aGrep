@@ -52,9 +52,5 @@
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/label_option" />
 
-        <activity
-            android:name=".ColorPickerActivity"
-            android:configChanges="keyboardHidden|orientation"
-            android:label="@string/label_option" />
     </application>
 </manifest>
