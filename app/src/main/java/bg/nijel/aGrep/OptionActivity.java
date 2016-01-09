@@ -24,8 +24,6 @@ public class OptionActivity extends PreferenceActivity {
     private PreferenceScreen mPs = null;
     private Prefs  mPrefs;
 
-    final private static int REQUEST_CODE_HIGHLIGHT = 0x1000;
-    final private static int REQUEST_CODE_BACKGROUND = 0x1001;
     private FriendlyEditTextPreference mDpref;
 
     @SuppressWarnings("deprecation")

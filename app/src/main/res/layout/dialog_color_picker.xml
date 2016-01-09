@@ -63,7 +63,8 @@
         android:layout_marginBottom="10dp"
         android:orientation="horizontal">
 
-        <net.margaritov.preference.colorpicker.ColorPickerPanelView
+        <!--clone ColorPickerPanelView class-->
+        <bg.nijel.aGrep.utils.ColorPickerPanelViewOld
             android:id="@+id/old_color_panel"
             android:layout_width="0px"
             android:layout_height="fill_parent"

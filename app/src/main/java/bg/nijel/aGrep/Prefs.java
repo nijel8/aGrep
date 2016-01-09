@@ -45,8 +45,8 @@ public class Prefs
     boolean mRegularExrpression = false;
     boolean mMatchCase = false;
     int mFontSize = 16;
-    int mHighlightBg = 0xFF009688;
-    int mHighlightFg = 0xFFFFFFFF;
+    public int mHighlightBg = 0xFF009688;
+    public int mHighlightFg = 0xFFFFFFFF;
     boolean addLineNumber=false;
     ArrayList<CheckedString> mDirList = new ArrayList<>();
     ArrayList<CheckedString> mExtList = new ArrayList<>();

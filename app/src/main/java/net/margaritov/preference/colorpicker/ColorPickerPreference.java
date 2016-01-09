@@ -35,6 +35,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import bg.nijel.aGrep.Prefs;
+import bg.nijel.aGrep.R;
+import bg.nijel.aGrep.utils.ColorPickerPanelViewOld;
+
 /**
  * A preference type that allows a user to choose a time
  *
@@ -53,6 +57,9 @@ public class ColorPickerPreference
     private float mDensity = 0;
     private boolean mAlphaSliderEnabled = false;
     private boolean mHexValueEnabled = false;
+
+    //my field
+    String whichColor = "";
 
     public ColorPickerPreference(Context context) {
         super(context);
@@ -108,7 +115,6 @@ public class ColorPickerPreference
         setPreviewColor();
     }
 
-    @SuppressWarnings("deprecation")
     private void setPreviewColor() {
         if (mView == null) return;
         ImageView iView = new ImageView(getContext());
@@ -118,7 +124,7 @@ public class ColorPickerPreference
         widgetFrameView.setPadding(
                 widgetFrameView.getPaddingLeft(),
                 widgetFrameView.getPaddingTop(),
-               0,// (int) (mDensity * 8), //original code
+                0,// (int) (mDensity * 8), //original code
                 widgetFrameView.getPaddingBottom()
         );
         // remove already create preview image
@@ -128,7 +134,7 @@ public class ColorPickerPreference
         }
         widgetFrameView.addView(iView);
         widgetFrameView.setMinimumWidth(0);
-      //  iView.setBackgroundDrawable(new AlphaPatternDrawable((int) (5 * mDensity))); //original code
+       // iView.setBackgroundDrawable(new AlphaPatternDrawable((int) (5 * mDensity)));
         iView.setImageBitmap(getPreviewBitmap());
     }
 
@@ -136,8 +142,6 @@ public class ColorPickerPreference
         int d = (int) (mDensity * 40); //30dip  //original code was * 31
         int color = mValue;
         Bitmap bmrec = Bitmap.createBitmap(d, d, Config.ARGB_8888);
-
-
         //code borrowed from NativeClipboard author... sorry for stealing it :(
         Bitmap bmcir = Bitmap.createBitmap(bmrec.getWidth(), bmrec.getHeight(), Config.ARGB_8888);
         Canvas canvas = new Canvas(bmcir);
@@ -159,9 +163,8 @@ public class ColorPickerPreference
         paint1.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas1.drawBitmap(bmcir, rect1, rect1, paint1);
         return bmcir;
-
-
-         //original code
+        //end
+        //original code
         /*int w = bm.getWidth();
         int h = bm.getHeight();
         int c = color;
@@ -174,7 +177,6 @@ public class ColorPickerPreference
                 }
             }
         }
-
         return bm;*/
     }
 
@@ -193,12 +195,31 @@ public class ColorPickerPreference
     }
 
     public boolean onPreferenceClick(Preference preference) {
+        //my code
+        if (preference != null) {
+            whichColor = preference.getKey();
+        }
+        //end my code
         showDialog(null);
         return false;
     }
 
     protected void showDialog(Bundle state) {
         mDialog = new ColorPickerDialog(getContext(), mValue);
+        //my code
+        Prefs p = Prefs.loadPrefs(getContext());
+        ColorPickerPanelView.mColorText = p.mHighlightFg;
+        ColorPickerPanelView.mColor = p.mHighlightBg;
+        ColorPickerPanelViewOld.mColorText = ColorPickerPanelView.mColorText;
+        ColorPickerPanelViewOld.mColor = ColorPickerPanelView.mColor;
+        if (whichColor.equals(Prefs.KEY_HIGHLIGHTFG)) {
+            ColorPickerPanelView.mIsTextColor = true;
+            mDialog.setTitle(R.string.label_highlight_fg);
+        } else if (whichColor.equals(Prefs.KEY_HIGHLIGHTBG)) {
+            ColorPickerPanelView.mIsTextColor = false;
+            mDialog.setTitle(R.string.label_highlight_bg);
+        }
+        //end my code
         mDialog.setOnColorChangedListener(this);
         if (mAlphaSliderEnabled) {
             mDialog.setAlphaSliderVisible(true);
