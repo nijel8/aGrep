@@ -61,7 +61,6 @@ public class Prefs
         String dirs = sp.getString(KEY_TARGET_DIRECTORIES_NEW,"" );
         prefs.mDirList	= new ArrayList<>();
         if ( dirs.length()>0 ){
-            RootShell.log(RootShell.debugTag,"new dirs----" + dirs);
             String[] dirsarr = dirs.split("\\|");
             int size = dirsarr.length;
             for( int i=0;i<size;i+=2 ){
@@ -71,7 +70,6 @@ public class Prefs
             }
         }else{
             dirs = sp.getString(KEY_TARGET_DIRECTORIES_OLD,"" );
-            RootShell.log(RootShell.debugTag,"old dirs----" + dirs);
             if ( dirs.length()>0 ){
                 String[] dirsarr = dirs.split("\\|");
                 for (String aDirsarr : dirsarr) {
@@ -122,7 +120,7 @@ public class Prefs
         RootShell.debugMode = prefs.mDebug;
         RootShell.debugTag = prefs.mDebugTag;
 
-        RootShell.log(RootShell.debugTag, "Prefs:Loaded...");
+      //  RootShell.log(RootShell.debugTag, "Prefs:Loaded...");
 
         return prefs;
     }
@@ -169,7 +167,7 @@ public class Prefs
 
         editor.apply();
 
-        RootShell.log(RootShell.debugTag, "Prefs:Saved...");
+       // RootShell.log(RootShell.debugTag, "Prefs:Saved...");
 
     }
 

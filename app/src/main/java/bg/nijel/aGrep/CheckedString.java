@@ -7,12 +7,18 @@ public class CheckedString {
     public CheckedString(String _s){
         this(true,_s);
     }
+
     public CheckedString(boolean _c,String _s){
-        checked = _c;
-        string = _s;
+        this.checked = _c;
+        this.string = _s;
     }
+
+    public CheckedString setChecked(boolean checked){
+        return new CheckedString(checked, this.string);
+    }
+
     public String toString(){
-        return (checked?"true":"false") + "|" + string;
+        return this.checked + "|" + this.string;
     }
 
 }

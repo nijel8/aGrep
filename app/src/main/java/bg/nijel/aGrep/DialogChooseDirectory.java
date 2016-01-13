@@ -39,6 +39,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
     Result m_result = null;
     private Prefs mPrefs;
     private TextView title;
+    public static String mBrowsingFolder;
 
 
     public class DirAdapter extends ArrayAdapter<File> {
@@ -68,6 +69,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
 
     private void listDirs() {
         this.m_entries.clear();
+        RootShell.log(RootShell.debugTag, " list canRead:" + this.m_currentDir.canRead(), RootShell.LogLevel.ERROR, null);
         if (this.m_currentDir.canRead()) {
             File[] files = this.m_currentDir.listFiles();
             if (this.m_currentDir.getParent() != null) {
@@ -101,6 +103,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
         this.m_context = ctx;
         this.m_result = res;
         this.mPrefs = Prefs.loadPrefs(this.m_context);
+        this.mBrowsingFolder = startDir;
         if (startDir != null) {
             this.m_currentDir = new File(startDir);
         } else {
@@ -118,6 +121,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
                     DialogChooseDirectory.this.m_result.onChooseDirectory(DialogChooseDirectory.this.m_currentDir.getAbsolutePath());
                 }
                 dialog.dismiss();
+                mBrowsingFolder = null;
             }
         });
 
@@ -125,12 +129,14 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
             public void onClick(DialogInterface dialog, int id) {
                 new DialogChooseDirectory(DialogChooseDirectory.this.m_context, DialogChooseDirectory.this.m_result, Environment.getExternalStorageDirectory().getAbsolutePath());
                 dialog.dismiss();
+                mBrowsingFolder = null;
             }
         });
 
         builder.setNegativeButton("CANCEL", new OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
+                mBrowsingFolder = null;
             }
         });
 
@@ -175,6 +181,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
             }
             listDirs();
             this.title.setText(DialogChooseDirectory.this.m_currentDir.getAbsolutePath());
+            mBrowsingFolder = DialogChooseDirectory.this.m_currentDir.getAbsolutePath();/////////////////////////////////////
             //this.m_alertDialog.setTitle(DialogChooseDirectory.this.m_currentDir.getAbsolutePath());
             this.m_list.setAdapter(new DirAdapter(R.layout.listitem_row_textview));
         }

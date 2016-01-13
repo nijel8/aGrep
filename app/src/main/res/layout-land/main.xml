@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:orientation="vertical">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -14,15 +14,14 @@
             android:id="@+id/ButtonHistory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="Recent searches"
             android:layout_gravity="center"
             android:layout_marginBottom="0dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="0dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@drawable/history"
-            android:tint="#FF727272"/>
+            android:tint="#FF727272" />
 
         <AutoCompleteTextView
             android:id="@+id/EditText01"
@@ -33,41 +32,39 @@
             android:layout_marginRight="0dp"
             android:layout_marginTop="0dp"
             android:layout_weight="1.0"
+            android:inputType="none"
             android:completionThreshold="1"
             android:hint="@string/label_hint"
             android:imeOptions="actionSearch|flagNoExtractUi"
-            android:inputType="none"
             android:paddingBottom="0dp"
             android:paddingTop="0dp"
-            android:singleLine="true"/>
+            android:singleLine="true" />
 
         <ImageButton
             android:id="@+id/ButtonSearch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="Search"
             android:layout_gravity="center"
             android:layout_marginBottom="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="5dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="5dp"
             android:layout_marginTop="0dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@drawable/search"
-            android:tint="#FF727272"/>
+            android:tint="#FF727272" />
 
         <ImageButton
             android:id="@+id/ButtonClear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="Clear"
             android:layout_gravity="center"
             android:layout_marginBottom="0dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
             android:layout_marginTop="0dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@drawable/clr"
-            android:tint="#FF727272"/>
+            android:tint="#FF727272" />
     </LinearLayout>
 
     <LinearLayout
@@ -82,35 +79,35 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_match_whole"
-            android:textSize="16.0sp"/>
+            android:textSize="16.0sp" />
 
         <Space
             android:layout_width="10dp"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <CheckBox
             android:id="@+id/checkmatchcase"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_ignore_case"
-            android:textSize="16.0sp"/>
+            android:textSize="16.0sp" />
 
         <Space
             android:layout_width="10dp"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <CheckBox
             android:id="@+id/checkre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_re"
-            android:textSize="16.0sp"/>
+            android:textSize="16.0sp" />
 
         <Space
             android:layout_width="15px"
-            android:layout_height="0dp"/>
+            android:layout_height="0dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -121,12 +118,25 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center|start"
-            android:layout_marginStart="10dp"
+            android:layout_gravity="center|left"
+            android:layout_marginLeft="5dp"
             android:layout_weight="1.0"
             android:text="@string/label_ext"
             android:textSize="18.0sp"
-            android:textStyle="italic"/>
+            android:textStyle="italic" />
+
+        <Button
+            android:id="@+id/addext"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|right"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="0dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:text="ADD"
+            android:textColor="#ff009688" />
     </LinearLayout>
 
     <HorizontalScrollView
@@ -146,7 +156,7 @@
             android:divider="?android:dividerVertical"
             android:orientation="horizontal"
             android:paddingTop="4.0dip"
-            android:showDividers="middle"/>
+            android:showDividers="middle" />
     </HorizontalScrollView>
 
     <LinearLayout
@@ -157,12 +167,12 @@
         <TextView
             android:layout_width="0.0dip"
             android:layout_height="wrap_content"
-            android:layout_gravity="center|start"
-            android:layout_marginStart="10dp"
+            android:layout_gravity="center|left"
+            android:layout_marginLeft="5dp"
             android:layout_weight="1.0"
             android:text="@string/label_dir"
             android:textSize="18.0sp"
-            android:textStyle="italic"/>
+            android:textStyle="italic" />
 
         <bg.nijel.aGrep.utils.FriendlyImageButton
             android:id="@+id/select_all"
@@ -176,56 +186,26 @@
             android:layout_marginTop="0dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:tint="#FF009688"/>
+
+        <Button
+            android:id="@+id/adddir"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|right"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="0dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:text="ADD"
+            android:textColor="#ff009688" />
     </LinearLayout>
 
-    <FrameLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:fab="http://schemas.android.com/apk/res-auto"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/cardListDirs"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-       <android.support.v7.widget.RecyclerView
-            android:id="@+id/cardListDirs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="6.0dip"
-            android:paddingRight="6.0dip"/>
-
-        <bg.nijel.aGrep.utils.HideKeyboardFab
-            android:id="@+id/fab_add_dir_ext_bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginBottom="4dp"
-            android:layout_marginEnd="6dp"
-            fab:menu_colorNormal="#ff3d00"
-            fab:menu_fab_size="normal"
-            fab:menu_icon="@drawable/ic_add_white_24dp"
-            fab:menu_showShadow="true"
-            fab:menu_labels_textColor="#212121"
-            fab:menu_labels_colorNormal="#FFFFFF"
-            fab:menu_labels_colorPressed="#FFFFFF"
-            fab:menu_labels_colorRipple="#FFFFFF">
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fab_add_exd_bottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="addExtension"
-                android:src="@drawable/ic_note_add_white_24dp"
-                fab:fab_label="Add extension"
-                fab:fab_size="mini"/>
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fab_add_dir_bottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="addFolder"
-                android:src="@drawable/ic_create_new_folder_white_24dp"
-                fab:fab_label="Add folder"
-                fab:fab_size="mini"/>
-        </bg.nijel.aGrep.utils.HideKeyboardFab>
-
-    </FrameLayout>
+        android:layout_height="wrap_content"
+        android:paddingLeft="6.0dip"
+        android:paddingRight="6.0dip" />
 
 </LinearLayout>

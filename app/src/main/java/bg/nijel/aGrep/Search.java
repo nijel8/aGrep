@@ -39,8 +39,7 @@ import bg.nijel.aGrep.utils.RootCommands;
 
 
 @SuppressLint("DefaultLocale")
-public class Search extends Activity implements GrepView.Callback
-{
+public class Search extends Activity implements GrepView.Callback {
     private GrepView mGrepView;
     private GrepView.GrepAdapter mAdapter;
     private ArrayList<GrepView.Data> mData;
@@ -60,9 +59,9 @@ public class Search extends Activity implements GrepView.Callback
     //static final String FILES_MATCHED = "filesMatched";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);ActionBar actionBar = getActionBar();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -70,9 +69,9 @@ public class Search extends Activity implements GrepView.Callback
         mFoundcount = 0;
         mPrefs = Prefs.loadPrefs(this);
         setContentView(R.layout.result);
-        mGrepView = (GrepView)findViewById(R.id.DicView01);
+        mGrepView = (GrepView) findViewById(R.id.DicView01);
         mData = new ArrayList<>();
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             mPattern = (Pattern) savedInstanceState.getSerializable(SEARCH_PATTERN);
             mQuery = savedInstanceState.getString(SERACH_QUERY);
             mData = savedInstanceState.getParcelableArrayList(SEARCH_DATA);
@@ -81,46 +80,46 @@ public class Search extends Activity implements GrepView.Callback
             mGrepView.setAdapter(mAdapter);
             mAdapter.setFormat(mPattern, mPrefs.mHighlightFg, mPrefs.mHighlightBg, mPrefs.mFontSize);
             mGrepView.setCallback(this);
-        }else {
-
-        if ( mPrefs.mDirList.size() == 0 ) {
-            Toast.makeText(getApplicationContext(), R.string.label_no_target_dir, Toast.LENGTH_LONG).show();
-            startActivity( new Intent(this,Settings.class) );
-            finish();
-        }
-        mAdapter = new GrepView.GrepAdapter(getApplicationContext(), R.layout.list_row, R.id.DicView01, mData);
-        mGrepView.setAdapter( mAdapter );
-        mGrepView.setCallback(this);
-        Intent it = getIntent();
-        if (it != null && Intent.ACTION_SEARCH.equals(it.getAction())) {
-            Bundle extras = it.getExtras();
-            mQuery = extras.getString(SearchManager.QUERY);
-            if (mQuery != null && mQuery.length() > 0) {
-                mPrefs.addRecent(this, mQuery);
-                String patternText = mQuery;
-                if (!mPrefs.mMatchWhole) {
-                    if (!mPrefs.mRegularExrpression) {
-                        patternText = escapeMetaChar(patternText);
-                        patternText = convertOrPattern(patternText);
-                    }
-                }
-                if (!mPrefs.mMatchCase) {
-                    mPattern = Pattern.compile(patternText, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE);
-                } else {
-                    mPattern = Pattern.compile(patternText);
-                }
-                if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-                    mData.removeAll(mData);
-                    mAdapter.setFormat(mPattern, mPrefs.mHighlightFg, mPrefs.mHighlightBg, mPrefs.mFontSize);
-                    mGetFilesTask = new getFilesTask();
-                    mGetFilesTask.execute("true");// mTask = new GrepTask();// mTask.execute(mQuery);
-                }
-            } else {
+        } else {
+            if (mPrefs.mDirList.size() == 0) {
+                Toast.makeText(getApplicationContext(), R.string.label_no_target_dir, Toast.LENGTH_LONG).show();
+                startActivity(new Intent(this, Settings.class));
                 finish();
             }
+            mAdapter = new GrepView.GrepAdapter(getApplicationContext(), R.layout.list_row, R.id.DicView01, mData);
+            mGrepView.setAdapter(mAdapter);
+            mGrepView.setCallback(this);
+            Intent it = getIntent();
+            if (it != null && Intent.ACTION_SEARCH.equals(it.getAction())) {
+                Bundle extras = it.getExtras();
+                mQuery = extras.getString(SearchManager.QUERY);
+                if (mQuery != null && mQuery.length() > 0) {
+                    mPrefs.addRecent(this, mQuery);
+                    String patternText = mQuery;
+                    if (!mPrefs.mMatchWhole) {
+                        if (!mPrefs.mRegularExrpression) {
+                            patternText = escapeMetaChar(patternText);
+                            patternText = convertOrPattern(patternText);
+                        }
+                    }
+                    if (!mPrefs.mMatchCase) {
+                        mPattern = Pattern.compile(patternText, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE);
+                    } else {
+                        mPattern = Pattern.compile(patternText);
+                    }
+                    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                        mData.removeAll(mData);
+                        mAdapter.setFormat(mPattern, mPrefs.mHighlightFg, mPrefs.mHighlightBg, mPrefs.mFontSize);
+                        mGetFilesTask = new getFilesTask();
+                        mGetFilesTask.execute("true");// mTask = new GrepTask();// mTask.execute(mQuery);
+                    }
+                } else {
+                    startActivity(new Intent(this, Settings.class));
+                    finish();
+                }
+            }
         }
-        }
-        getActionBar().setTitle("aGrep - " + mFoundcount + " files" );
+        getActionBar().setTitle("aGrep - " + mFoundcount + " files");
     }
 
     @Override
@@ -130,22 +129,21 @@ public class Search extends Activity implements GrepView.Callback
         savedInstanceState.putSerializable(SEARCH_PATTERN, mPattern);
         savedInstanceState.putString(SERACH_QUERY, mQuery);
         savedInstanceState.putInt(TEXT_IN_FILES_COUNT, mFoundcount);
-       // savedInstanceState.putInt(FILES_MATCHED, mTargetFiles.size());
+        // savedInstanceState.putInt(FILES_MATCHED, mTargetFiles.size());
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    static public String escapeMetaChar( String pattern )
-    {
+    static public String escapeMetaChar(String pattern) {
         final String metachar = ".^${}[]*+?|()\\";
 
         StringBuilder newpat = new StringBuilder();
 
         int len = pattern.length();
 
-        for( int i=0;i<len;i++ ){
+        for (int i = 0; i < len; i++) {
             char c = pattern.charAt(i);
-            if ( metachar.indexOf(c) >=0 ){
+            if (metachar.indexOf(c) >= 0) {
                 newpat.append('\\');
             }
             newpat.append(c);
@@ -153,12 +151,10 @@ public class Search extends Activity implements GrepView.Callback
         return newpat.toString();
     }
 
-    static public String convertOrPattern( String pattern )
-    {
-        if ( pattern.contains(" ") ){
+    static public String convertOrPattern(String pattern) {
+        if (pattern.contains(" ")) {
             return "(" + pattern.replace(" ", "|") + ")";
-        }
-        else{
+        } else {
             return pattern;
         }
     }
@@ -169,7 +165,7 @@ public class Search extends Activity implements GrepView.Callback
 
         protected void onPreExecute() {
             mTargetFiles.clear();
-            mCancelled=false;
+            mCancelled = false;
             mProgressDialog = new ProgressDialog(Search.this);
             mProgressDialog.setTitle(R.string.count_title);
             mProgressDialog.setMessage(getString(R.string.count_progress));
@@ -179,9 +175,8 @@ public class Search extends Activity implements GrepView.Callback
             mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
                 @Override
-                public void onCancel(DialogInterface dialog)
-                {
-                    mCancelled=true;
+                public void onCancel(DialogInterface dialog) {
+                    mCancelled = true;
                     cancel(false);
                 }
             });
@@ -192,9 +187,9 @@ public class Search extends Activity implements GrepView.Callback
         @Override
         protected Boolean doInBackground(String... params) {
             RootShell.log(RootShell.debugTag, "mTargetFiles Initial Size: " + mTargetFiles.size(), RootShell.LogLevel.WARN, null);
-            for( CheckedString dir : mPrefs.mDirList ){
-                if ( dir.checked){
-                   mTargetFiles.addAll(RootCommands.listFiles(dir.string));
+            for (CheckedString dir : mPrefs.mDirList) {
+                if (dir.checked) {
+                    mTargetFiles.addAll(RootCommands.listFiles(dir.string));
                 }
             }
 
@@ -214,12 +209,13 @@ public class Search extends Activity implements GrepView.Callback
             RootShell.log(RootShell.debugTag, "mTargetFiles Filtered Size: " + mTargetFiles.size(), RootShell.LogLevel.WARN, null);
             mProgressDialog.dismiss();
             mProgressDialog = null;
-            if (mTargetFiles != null && mTargetFiles.size() > 0) {
+            if (mTargetFiles != null && mTargetFiles.size() > 0 && !mCancelled) {
                 mTask = new GrepTask();
                 mTask.execute(mQuery);
-            }else {
+            } else if(!mCancelled){
+                Toast.makeText(getApplicationContext(), getString(R.string.search_aborted), Toast.LENGTH_LONG).show();
+              //  startActivity(new Intent(getApplicationContext(), Settings.class));
                 finish();
-                Toast.makeText(getApplicationContext(),getString(R.string.search_aborted), Toast.LENGTH_LONG).show();
             }
             mGetFilesTask = null;
         }
@@ -227,46 +223,48 @@ public class Search extends Activity implements GrepView.Callback
         @Override
         protected void onCancelled() {
             super.onCancelled();
+            mCancelled = true;
+            Toast.makeText(getApplicationContext(), getString(R.string.grep_canceled), Toast.LENGTH_LONG).show();
+            startActivity(new Intent(getApplicationContext(), Settings.class));
             onPostExecute(false);
         }
 
         @Override
-        protected void onProgressUpdate(Integer... progress)
-        {
-            if ( isCancelled() ){
+        protected void onProgressUpdate(Integer... progress) {
+            if (isCancelled() || mCancelled) {
                 return;
             }
         }
 
         private boolean filterMatchingFiles(ArrayList<String> files) {
-            if (isCancelled()) {
+            if (isCancelled() || mCancelled) {
                 return false;
             }
             mTargetFiles.clear();
             filesloop:
             for (String file : files) {
-                if (isCancelled()) {
+                if (isCancelled() || mCancelled) {
                     return false;
                 }
                 for (CheckedString ext : mPrefs.mExtList) {
                     if (ext.checked) {
-                      //  RootShell.log(RootShell.debugTag, "path:" + file, RootShell.LogLevel.ERROR, null);
+                        //  RootShell.log(RootShell.debugTag, "path:" + file, RootShell.LogLevel.ERROR, null);
                         if (ext.string.equals("*")) {
                             mTargetFiles.add(file);
                             continue filesloop;
                         }
-                        if (ext.string.equals("*no_ext") && !file.substring(file.lastIndexOf('/')+1, file.length()).contains(".")) {
-                       //     RootShell.log(RootShell.debugTag, "*no_ext:" + file, RootShell.LogLevel.WARN, null);
+                        if (ext.string.equals("*no_ext") && !file.substring(file.lastIndexOf('/') + 1, file.length()).contains(".")) {
+                            //     RootShell.log(RootShell.debugTag, "*no_ext:" + file, RootShell.LogLevel.WARN, null);
                             mTargetFiles.add(file);
                             continue filesloop;
                         }
                         if (file.toLowerCase().endsWith("." + ext.string.toLowerCase())/* && !ext.string.equals(".")*/) {
-                         //   RootShell.log(RootShell.debugTag, "ext name:" + file, RootShell.LogLevel.WARN, null);
+                            //   RootShell.log(RootShell.debugTag, "ext name:" + file, RootShell.LogLevel.WARN, null);
                             mTargetFiles.add(file);
                             continue filesloop;
                         }
-                        if(ext.string.equals(".") && file.endsWith(".")) {
-                          //  RootShell.log(RootShell.debugTag, ". name:" + file, RootShell.LogLevel.WARN, null);
+                        if (ext.string.equals(".") && file.endsWith(".")) {
+                            //  RootShell.log(RootShell.debugTag, ". name:" + file, RootShell.LogLevel.WARN, null);
                             mTargetFiles.add(file);
                             continue filesloop;
                         }
@@ -281,13 +279,13 @@ public class Search extends Activity implements GrepView.Callback
     class GrepTask extends AsyncTask<String, GrepView.Data, Boolean> {
         private ProgressDialog mProgressDialog;
         private int mFileCount = 0;
-        private boolean mCancelled;
+        private boolean mCancelled = false;
         private String mSearchingFile;
 
         @Override
         protected void onPreExecute() {
 
-            mCancelled=false;
+            mCancelled = false;
             mProgressDialog = new ProgressDialog(Search.this);
             mProgressDialog.setTitle(R.string.grep_spinner);
             mProgressDialog.setMessage(mQuery);
@@ -297,9 +295,8 @@ public class Search extends Activity implements GrepView.Callback
             mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
                 @Override
-                public void onCancel(DialogInterface dialog)
-                {
-                    mCancelled=true;
+                public void onCancel(DialogInterface dialog) {
+                    mCancelled = true;
                     cancel(false);
                 }
             });
@@ -307,8 +304,7 @@ public class Search extends Activity implements GrepView.Callback
         }
 
         @Override
-        protected Boolean doInBackground(String... query)
-        {
+        protected Boolean doInBackground(String... query) {
             return grepFile();
         }
 
@@ -324,47 +320,48 @@ public class Search extends Activity implements GrepView.Callback
                 }
                 mGrepView.setSelection(0);
                 Toast.makeText(getApplicationContext(), result ? R.string.grep_finished : R.string.grep_canceled, Toast.LENGTH_LONG).show();
-            }else {
+            } else {
+                Toast.makeText(getApplicationContext(), getString(R.string.grep_aborted), Toast.LENGTH_LONG).show();
+                startActivity(new Intent(getApplicationContext(), Settings.class));
                 finish();
-                Toast.makeText(getApplicationContext(),getString(R.string.grep_aborted), Toast.LENGTH_LONG).show();
             }
-          //  mData = null;
+            //  mData = null;
             mAdapter = null;
             mTask = null;
-            getActionBar().setTitle("aGrep - " + mFoundcount + " files" );
+            getActionBar().setTitle("aGrep - " + mFoundcount + " files");
         }
 
         @Override
         protected void onCancelled() {
             super.onCancelled();
+            mCancelled = true;
             onPostExecute(false);
         }
 
         @Override
-        protected void onProgressUpdate(GrepView.Data... progress)
-        {
-            if ( isCancelled() ){
+        protected void onProgressUpdate(GrepView.Data... progress) {
+            if (isCancelled() || mCancelled) {
                 return;
             }
             mProgressDialog.setMessage(Search.this.getString(R.string.progress, mQuery, mSearchingFile, mFileCount, mTargetFiles.size()));
-            if ( progress != null ){
-                synchronized( mData ){
-                    for( GrepView.Data data : progress ){
+            if (progress != null) {
+                synchronized (mData) {
+                    for (GrepView.Data data : progress) {
                         mData.add(data);
                     }
                     mAdapter.notifyDataSetChanged();
-                    mGrepView.setSelection(mData.size()-1);
+                    mGrepView.setSelection(mData.size() - 1);
                 }
             }
         }
 
         boolean grepFile(/* File file  */) {
-            if (isCancelled()) {
+            if (isCancelled() || mCancelled) {
                 return false;
             }
             InputStream is;
             for (String path : mTargetFiles) {
-                if (isCancelled()) {
+                if (isCancelled() || mCancelled) {
                     return false;
                 }
                 File file = new File(path);
@@ -462,13 +459,12 @@ public class Search extends Activity implements GrepView.Callback
         }
     }
 
-    public static SpannableString highlightKeyword(CharSequence text, Pattern p, int fgcolor, int bgcolor)
-    {
+    public static SpannableString highlightKeyword(CharSequence text, Pattern p, int fgcolor, int bgcolor) {
         SpannableString ss = new SpannableString(text);
 
         int start = 0;
         int end;
-        Matcher m = p.matcher( text );
+        Matcher m = p.matcher(text);
         while (m.find(start)) {
             start = m.start();
             end = m.end();
@@ -484,31 +480,29 @@ public class Search extends Activity implements GrepView.Callback
     }
 
     @Override
-    public void onGrepItemClicked(int position)
-    {
+    public void onGrepItemClicked(int position) {
         GrepView.Data data = (GrepView.Data) mGrepView.getAdapter().getItem(position);
 
-        Intent it = new Intent(this,TextViewer.class);
+        Intent it = new Intent(this, TextViewer.class);
 
-        it.putExtra(TextViewer.EXTRA_PATH , data.mFile.getAbsolutePath() );
+        it.putExtra(TextViewer.EXTRA_PATH, data.mFile.getAbsolutePath());
         it.putExtra(TextViewer.EXTRA_QUERY, mQuery);
-        it.putExtra(TextViewer.EXTRA_LINE, data.mLinenumber );
+        it.putExtra(TextViewer.EXTRA_LINE, data.mLinenumber);
 
         startActivity(it);
     }
 
     @Override
-    public boolean onGrepItemLongClicked(int position)
-    {
-        
+    public boolean onGrepItemLongClicked(int position) {
+
         GrepView.Data data = (GrepView.Data) mGrepView.getAdapter().getItem(position);
         Uri startDir = Uri.fromFile(new File(data.mFile.getParent()));
-    Intent intent = new Intent();
-    intent.setData(startDir);
-    intent.setType("*/*");
-    intent.setAction(Intent.ACTION_VIEW);
-    startActivity(intent);
-        
+        Intent intent = new Intent();
+        intent.setData(startDir);
+        intent.setType("*/*");
+        intent.setAction(Intent.ACTION_VIEW);
+        startActivity(intent);
+
         return false;
     }
 

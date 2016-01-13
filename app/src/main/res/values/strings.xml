@@ -5,7 +5,7 @@
     <string name="grep_finished">Finished…</string>
     <string name="label_match_whole">Match whole</string>
     <string name="grep_canceled">Canceled…</string>
-    <string name="label_dir"><u>Target directories:</u></string>
+    <string name="label_dir"><u>Target folders:</u></string>
     <string name="label_ext"><u>Target extensions:</u></string>
     <string name="label_re">Use RegEx</string>
     <string name="label_ignore_case">Match case</string>
@@ -47,6 +47,7 @@
     <string name="search_aborted">No files found matching search criteria. Search aborted…</string>
     <string name="grep_aborted">Text not found in selected files…</string>
     <string name="search_text_empty">Search query is empty…</string>
+    <string name="no_file_manager_found">No installed file explorer found…</string>
     
     <!-- Color Picker -->
     <string name="dialog_color_picker">Color Picker</string>

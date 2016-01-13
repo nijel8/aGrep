@@ -24,7 +24,6 @@ public class RootCommands {
         ArrayList<String> items;
         items = executeForResult("ls -a " + getCommandLineString(path));
         for (String name : items) {
-                RootShell.log(RootShell.debugTag, path + "/" + name);
                 if (items.get(0).equals(name)) {
                     folders.add(new File(".."));
                 }
@@ -34,6 +33,9 @@ public class RootCommands {
                 }else {
                     RootShell.log(RootShell.debugTag, "canRead: " + path + "/" + name + "->" + dir.canRead(), RootShell.LogLevel.ERROR, null);
                 }
+        }
+        if (folders.size() < 1){
+            folders.add(new File(".."));
         }
         return folders;
     }

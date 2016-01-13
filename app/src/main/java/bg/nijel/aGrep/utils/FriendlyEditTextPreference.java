@@ -48,7 +48,7 @@ public class FriendlyEditTextPreference extends EditTextPreference {
     @Override
     protected void onAddEditTextToDialogView(View dialogView, EditText editText) {
         super.onAddEditTextToDialogView(dialogView, editText);
-        editText.selectAll();
+        editText.setSelection(0, editText.length());
     }
 
 }
