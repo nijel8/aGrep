@@ -14,12 +14,8 @@
     <string name="label_ADD">Add</string>
     <string name="label_OK">OK</string>
     <string name="label_CANCEL">Cancel</string>
-    <string name="label_remove_item_title">%s</string>
     <string name="label_remove_item">Remove item?</string>
-    <string name="label_no_target_dir">"Add target directory…"</string>
-    <string name="menu_viewer">View</string>
-    <string name="grep_spinner">Searching for…</string>
-    <string name="progress">%1$s\n\nin file:\n %2$s\n\n(%3$d of %4$d)</string>
+    <string name="menu_viewer_title">View</string>
     <string name="label_unable_access">Access denied…</string>
     <string name="label_option">Preferences</string>
     <string name="label_font_size">Font size</string>
@@ -33,23 +29,19 @@
     <string name="label_root_access">Root access.</string>
     <string name="summary_add_linenumber">Go to line if text editor supports it.</string>
     <string name="label_copied">Copied to clipboard</string>
-    <string name="color_picker_input">Input color code</string>
-    <string name="color_picker_hint">Enter 6-digit hexadecimal color code</string>
     <string name="no_target_directory">Select target directory…</string>
     <string name="no_target_extension">Select target extension…</string>
-    <string name="count_title">Searching…</string>
     <string name="count_progress">Filtering files…</string>
     <string name="label_debug">Debug</string>
     <string name="summary_debug">Enable logging in logcat.</string>
     <string name="label_debug_tag">Debug TAG</string>
     <string name="summary_debug_tag">Set custom TAG in logcat.Current tag is %s</string>
     <string name="summary_debug_hint">aGrepD</string>
-    <string name="search_aborted">No files found matching search criteria. Search aborted…</string>
     <string name="grep_aborted">Text not found in selected files…</string>
     <string name="search_text_empty">Search query is empty…</string>
     <string name="no_file_manager_found">No installed file explorer found…</string>
+
     
     <!-- Color Picker -->
-    <string name="dialog_color_picker">Color Picker</string>
     <string name="press_color_to_apply">Press on Color to apply</string>
 </resources>

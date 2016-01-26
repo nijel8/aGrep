@@ -22,7 +22,6 @@ import bg.nijel.aGrep.utils.FriendlyEditTextPreference;
 public class OptionActivity extends PreferenceActivity {
 
     private PreferenceScreen mPs = null;
-    private Prefs  mPrefs;
 
     private FriendlyEditTextPreference mDpref;
 
@@ -37,7 +36,7 @@ public class OptionActivity extends PreferenceActivity {
         }
 
 
-        mPrefs = Prefs.loadPrefs(this);
+        Prefs mPrefs = Prefs.loadPrefs(this);
 
         PreferenceManager mPm = getPreferenceManager();
         mPs = mPm.createPreferenceScreen(this);

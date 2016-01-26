@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/layout_files_count"
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:gravity="center">
+
+        <TextView
+            android:id="@+id/hits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="hits:"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"/>
+
+        <TextView
+            android:id="@+id/hits_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/hits"
+            android:text="9"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textColor="?android:colorPrimary"
+            android:layout_marginLeft="20dp"/>
+
+        <TextView
+            android:id="@+id/files"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/hits"
+            android:text="files: "
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"/>
+
+        <TextView
+            android:id="@+id/files_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/hits_count"
+            android:layout_alignEnd="@id/hits_count"
+            android:text="99"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textColor="?android:colorPrimary"/>
+
+</RelativeLayout>

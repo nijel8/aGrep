@@ -129,7 +129,7 @@ public class Shell {
 
     private boolean isCleaning = false;
 
-    private Shell(String cmd, ShellType shellType, ShellContext shellContext, int shellTimeout) throws IOException, TimeoutException, RootDeniedException {
+    private Shell(String cmd, ShellType shellType, final ShellContext shellContext, int shellTimeout) throws IOException, TimeoutException, RootDeniedException {
 
         RootShell.log("Starting shell: " + cmd);
         RootShell.log("Context: " + shellContext.getValue());
@@ -228,11 +228,242 @@ public class Shell {
                  *
                  * input, and output are runnables that the threads execute.
                  */
-                Thread si = new Thread(this.input, "Shell Input");
+                /*
+      Runnable to write commands to the open shell.
+      <p/>
+      When writing commands we stay in a loop and wait for new
+      commands to added to "commands"
+      <p/>
+      The notification of a new command is handled by the method add in this class
+     */
+                Runnable input = new Runnable() {
+                    public void run() {
+
+                        try {
+                            while (true) {
+
+                                synchronized (commands) {
+                                    /**
+                                     * While loop is used in the case that notifyAll is called
+                                     * and there are still no commands to be written, a rare
+                                     * case but one that could happen.
+                                     */
+                                    while (!close && write >= commands.size()) {
+                                        isExecuting = false;
+                                        commands.wait();
+                                    }
+                                }
+
+                                if (write >= maxCommands) {
+
+                                    /**
+                                     * wait for the read to catch up.
+                                     */
+                                    while (read != write) {
+                                        RootShell.log("Waiting for read and write to catch up before cleanup.");
+                                    }
+                                    /**
+                                     * Clean up the commands, stay neat.
+                                     */
+                                    cleanCommands();
+                                }
+
+                                /**
+                                 * Write the new command
+                                 *
+                                 * We write the command followed by the token to indicate
+                                 * the end of the command execution
+                                 */
+                                if (write < commands.size()) {
+                                    isExecuting = true;
+                                    Command cmd = commands.get(write);
+                                    cmd.startExecution();
+                                    RootShell.log("Executing: " + cmd.getCommand() + " with context: " + shellContext);
+
+                                    outputStream.write(cmd.getCommand());
+                                    String line = "\necho " + token + " " + totalExecuted + " $?\n";
+                                    outputStream.write(line);
+                                    outputStream.flush();
+                                    write++;
+                                    totalExecuted++;
+                                } else if (close) {
+                                    /**
+                                     * close the thread, the shell is closing.
+                                     */
+                                    isExecuting = false;
+                                    outputStream.write("\nexit 0\n");
+                                    outputStream.flush();
+                                    RootShell.log("Closing shell");
+                                    return;
+                                }
+                            }
+                        } catch (IOException e) {
+                            RootShell.log(e.getMessage(), RootShell.LogLevel.ERROR, e);
+                        } catch (InterruptedException e) {
+                            RootShell.log(e.getMessage(), RootShell.LogLevel.ERROR, e);
+                        } finally {
+                            write = 0;
+                            closeQuietly(outputStream);
+                        }
+                    }
+                };
+                Thread si = new Thread(input, "Shell Input");
                 si.setPriority(Thread.NORM_PRIORITY);
                 si.start();
 
-                Thread so = new Thread(this.output, "Shell Output");
+                /*
+      Runnable to monitor the responses from the open shell.
+
+      This include the output and error stream
+     */
+                Runnable output = new Runnable() {
+                    public void run() {
+                        try {
+                            Command command = null;
+
+                            //as long as there is something to read, we will keep reading.
+                            while (!close || inputStream.ready() || read < commands.size()) {
+                                isReading = false;
+                                String outputLine = inputStream.readLine();
+                                isReading = true;
+
+                                /**
+                                 * If we recieve EOF then the shell closed?
+                                 */
+                                if (outputLine == null) {
+                                    break;
+                                }
+
+                                if (command == null) {
+                                    if (read >= commands.size()) {
+                                        if (close) {
+                                            break;
+                                        }
+
+                                        continue;
+                                    }
+
+                                    command = commands.get(read);
+                                }
+
+                                /**
+                                 * trying to determine if all commands have been completed.
+                                 *
+                                 * if the token is present then the command has finished execution.
+                                 */
+                                int pos = -1;
+
+                                pos = outputLine.indexOf(token);
+
+                                if (pos == -1) {
+                                    /**
+                                     * send the output for the implementer to process
+                                     */
+                                    command.output(command.id, outputLine);
+                                } else if (pos > 0) {
+                                    /**
+                                     * token is suffix of output, send output part to implementer
+                                     */
+                                    command.output(command.id, outputLine.substring(0, pos));
+                                }
+
+                                if (pos >= 0) {
+                                    outputLine = outputLine.substring(pos);
+                                    String fields[] = outputLine.split(" ");
+
+                                    if (fields.length >= 2 && fields[1] != null) {
+                                        int id = 0;
+
+                                        try {
+                                            id = Integer.parseInt(fields[1]);
+                                        } catch (NumberFormatException e) {
+                                        }
+
+                                        int exitCode = -1;
+
+                                        try {
+                                            exitCode = Integer.parseInt(fields[2]);
+                                        } catch (NumberFormatException e) {
+                                        }
+
+                                        if (id == totalRead) {
+                                            processErrors(command);
+
+
+                                            /**
+                                             * wait for output to be processed...
+                                             *
+                                             */
+                                            int iterations = 0;
+                                            while (command.totalOutput > command.totalOutputProcessed) {
+
+                                                if (iterations == 0) {
+                                                    iterations++;
+                                                    RootShell.log("Waiting for output to be processed. " + command.totalOutputProcessed + " Of " + command.totalOutput);
+                                                }
+
+                                                try {
+
+                                                    synchronized (this) {
+                                                        this.wait(2000);
+                                                    }
+                                                } catch (Exception e) {
+                                                    RootShell.log(e.getMessage());
+                                                }
+                                            }
+
+                                            RootShell.log("Read all output");
+
+                                            command.setExitCode(exitCode);
+                                            command.commandFinished();
+                                            command = null;
+
+                                            read++;
+                                            totalRead++;
+                                            continue;
+                                        }
+                                    }
+                                }
+                            }
+
+                            try {
+                                proc.waitFor();
+                                proc.destroy();
+                            } catch (Exception e) {
+                            }
+
+                            while (read < commands.size()) {
+                                if (command == null) {
+                                    command = commands.get(read);
+                                }
+
+                                if (command.totalOutput < command.totalOutputProcessed) {
+                                    command.terminated("All output not processed!");
+                                    command.terminated("Did you forget the super.commandOutput call or are you waiting on the command object?");
+                                } else {
+                                    command.terminated("Unexpected Termination.");
+                                }
+
+                                command = null;
+                                read++;
+                            }
+
+                            read = 0;
+
+                        } catch (IOException e) {
+                            RootShell.log(e.getMessage(), RootShell.LogLevel.ERROR, e);
+                        } finally {
+                            closeQuietly(outputStream);
+                            closeQuietly(errorStream);
+                            closeQuietly(inputStream);
+
+                            RootShell.log("Shell destroyed");
+                            isClosed = true;
+                            isReading = false;
+                        }
+                    }
+                };
+                Thread so = new Thread(output, "Shell Output");
                 so.setPriority(Thread.NORM_PRIORITY);
                 so.start();
             }
@@ -540,86 +771,6 @@ public class Shell {
         return isSELinuxEnforcing;
     }
 
-    /**
-     * Runnable to write commands to the open shell.
-     * <p/>
-     * When writing commands we stay in a loop and wait for new
-     * commands to added to "commands"
-     * <p/>
-     * The notification of a new command is handled by the method add in this class
-     */
-    private Runnable input = new Runnable() {
-        public void run() {
-
-            try {
-                while (true) {
-
-                    synchronized (commands) {
-                        /**
-                         * While loop is used in the case that notifyAll is called
-                         * and there are still no commands to be written, a rare
-                         * case but one that could happen.
-                         */
-                        while (!close && write >= commands.size()) {
-                            isExecuting = false;
-                            commands.wait();
-                        }
-                    }
-
-                    if (write >= maxCommands) {
-
-                        /**
-                         * wait for the read to catch up.
-                         */
-                        while (read != write) {
-                            RootShell.log("Waiting for read and write to catch up before cleanup.");
-                        }
-                        /**
-                         * Clean up the commands, stay neat.
-                         */
-                        cleanCommands();
-                    }
-
-                    /**
-                     * Write the new command
-                     *
-                     * We write the command followed by the token to indicate
-                     * the end of the command execution
-                     */
-                    if (write < commands.size()) {
-                        isExecuting = true;
-                        Command cmd = commands.get(write);
-                        cmd.startExecution();
-                        RootShell.log("Executing: " + cmd.getCommand() + " with context: " + shellContext);
-
-                        outputStream.write(cmd.getCommand());
-                        String line = "\necho " + token + " " + totalExecuted + " $?\n";
-                        outputStream.write(line);
-                        outputStream.flush();
-                        write++;
-                        totalExecuted++;
-                    } else if (close) {
-                        /**
-                         * close the thread, the shell is closing.
-                         */
-                        isExecuting = false;
-                        outputStream.write("\nexit 0\n");
-                        outputStream.flush();
-                        RootShell.log("Closing shell");
-                        return;
-                    }
-                }
-            } catch (IOException e) {
-                RootShell.log(e.getMessage(), RootShell.LogLevel.ERROR, e);
-            } catch (InterruptedException e) {
-                RootShell.log(e.getMessage(), RootShell.LogLevel.ERROR, e);
-            } finally {
-                write = 0;
-                closeQuietly(outputStream);
-            }
-        }
-    };
-
     protected void notifyThreads() {
         Thread t = new Thread() {
             public void run() {
@@ -631,164 +782,6 @@ public class Shell {
 
         t.start();
     }
-
-    /**
-     * Runnable to monitor the responses from the open shell.
-     *
-     * This include the output and error stream
-     */
-    private Runnable output = new Runnable() {
-        public void run() {
-            try {
-                Command command = null;
-
-                //as long as there is something to read, we will keep reading.
-                while (!close || inputStream.ready() || read < commands.size()) {
-                    isReading = false;
-                    String outputLine = inputStream.readLine();
-                    isReading = true;
-
-                    /**
-                     * If we recieve EOF then the shell closed?
-                     */
-                    if (outputLine == null) {
-                        break;
-                    }
-
-                    if (command == null) {
-                        if (read >= commands.size()) {
-                            if (close) {
-                                break;
-                            }
-
-                            continue;
-                        }
-
-                        command = commands.get(read);
-                    }
-
-                    /**
-                     * trying to determine if all commands have been completed.
-                     *
-                     * if the token is present then the command has finished execution.
-                     */
-                    int pos = -1;
-
-                    pos = outputLine.indexOf(token);
-
-                    if (pos == -1) {
-                        /**
-                         * send the output for the implementer to process
-                         */
-                        command.output(command.id, outputLine);
-                    } else if (pos > 0) {
-                        /**
-                         * token is suffix of output, send output part to implementer
-                         */
-                        command.output(command.id, outputLine.substring(0, pos));
-                    }
-
-                    if (pos >= 0) {
-                        outputLine = outputLine.substring(pos);
-                        String fields[] = outputLine.split(" ");
-
-                        if (fields.length >= 2 && fields[1] != null) {
-                            int id = 0;
-
-                            try {
-                                id = Integer.parseInt(fields[1]);
-                            } catch (NumberFormatException e) {
-                            }
-
-                            int exitCode = -1;
-
-                            try {
-                                exitCode = Integer.parseInt(fields[2]);
-                            } catch (NumberFormatException e) {
-                            }
-
-                            if (id == totalRead) {
-                                processErrors(command);
-
-
-                                /**
-                                 * wait for output to be processed...
-                                 *
-                                 */
-                                int iterations = 0;
-                                while (command.totalOutput > command.totalOutputProcessed) {
-
-                                    if(iterations == 0)
-                                    {
-                                        iterations++;
-                                        RootShell.log("Waiting for output to be processed. " + command.totalOutputProcessed + " Of " + command.totalOutput);
-                                    }
-
-                                    try {
-
-                                        synchronized (this)
-                                        {
-                                            this.wait(2000);
-                                        }
-                                    } catch (Exception e) {
-                                        RootShell.log(e.getMessage());
-                                    }
-                                }
-
-                                RootShell.log("Read all output");
-
-                                command.setExitCode(exitCode);
-                                command.commandFinished();
-                                command = null;
-
-                                read++;
-                                totalRead++;
-                                continue;
-                            }
-                        }
-                    }
-                }
-
-                try {
-                    proc.waitFor();
-                    proc.destroy();
-                } catch (Exception e) {
-                }
-
-                while (read < commands.size()) {
-                    if (command == null) {
-                        command = commands.get(read);
-                    }
-
-                    if(command.totalOutput < command.totalOutputProcessed)
-                    {
-                        command.terminated("All output not processed!");
-                        command.terminated("Did you forget the super.commandOutput call or are you waiting on the command object?");
-                    }
-                    else
-                    {
-                        command.terminated("Unexpected Termination.");
-                    }
-
-                    command = null;
-                    read++;
-                }
-
-                read = 0;
-
-            } catch (IOException e) {
-                RootShell.log(e.getMessage(), RootShell.LogLevel.ERROR, e);
-            } finally {
-                closeQuietly(outputStream);
-                closeQuietly(errorStream);
-                closeQuietly(inputStream);
-
-                RootShell.log("Shell destroyed");
-                isClosed = true;
-                isReading = false;
-            }
-        }
-    };
 
     public void processErrors(Command command) {
         try {

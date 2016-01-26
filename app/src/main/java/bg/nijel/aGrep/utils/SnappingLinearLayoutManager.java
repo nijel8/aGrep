@@ -14,11 +14,9 @@ import android.util.DisplayMetrics;
 public class SnappingLinearLayoutManager extends LinearLayoutManager {
 
     private static final float MILLISECONDS_PER_INCH = 70f;//speed
-    private Context mContext;
 
     public SnappingLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
         super(context, orientation, reverseLayout);
-        mContext = context;
     }
 
     @Override

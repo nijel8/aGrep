@@ -24,14 +24,13 @@
         android:textStyle="bold"
         android:includeFontPadding="false"
         android:ellipsize="none"
-        android:layout_weight="1"
         android:layout_gravity="fill"
         android:focusable="false"/>
 
         <TextView
             android:id="@+id/dir_parent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:paddingEnd="6dp"
             android:paddingStart="34dp"
             android:singleLine="false"

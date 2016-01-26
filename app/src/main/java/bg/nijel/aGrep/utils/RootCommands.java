@@ -5,6 +5,7 @@ import com.stericson.RootShell.execution.Command;
 import com.stericson.RootShell.execution.Shell;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class RootCommands {
@@ -21,8 +22,7 @@ public class RootCommands {
 
     public static ArrayList<File> listFolders(String path) {
         ArrayList<File> folders = new ArrayList<>();
-        ArrayList<String> items;
-        items = executeForResult("ls -a " + getCommandLineString(path));
+        ArrayList<String> items = executeForResult("ls -a " + getCommandLineString(path));
         for (String name : items) {
                 if (items.get(0).equals(name)) {
                     folders.add(new File(".."));
@@ -41,11 +41,7 @@ public class RootCommands {
     }
 
     public static ArrayList<String> listFiles(String path) {
-        ArrayList<String> files;
-        files = executeForResult("find " + getCommandLineString(path) + " -type f -follow");
-        for (String name : files) {
-        }
-        return files;
+        return executeForResult("find " + getCommandLineString(path) + " -type f -follow");
     }
 
     public static int countFiles(String path){
@@ -58,9 +54,28 @@ public class RootCommands {
         return -1;
     }
 
+    public static boolean cancelAllRootCommands(){
+        try {
+            RootShell.closeAllShells();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Shell.isAnyShellOpen();
+        }
+        return Shell.isAnyShellOpen();
+    }
+
+    public static String fileAsHex(String filePath){
+        final ArrayList<String> hex = executeForResult("hexdump -ve '1/1 \"%.2x\"' " + getCommandLineString(filePath) + " ; echo");
+        if (hex != null && hex.size() == 1) {
+            RootShell.log(RootShell.debugTag, "File as HEX:" + hex.get(0));
+            return hex.get(0);
+        }
+        RootShell.log(RootShell.debugTag, "File as HEX: N/A", RootShell.LogLevel.ERROR,null);
+        return null;
+    }
+
     private static ArrayList<String> executeForResult(String cmd) {
         final ArrayList<String> results = new ArrayList<>();
-
         Command command = new Command(911, false, cmd) {
             @Override
             public String commandOutput(int id, String line) {

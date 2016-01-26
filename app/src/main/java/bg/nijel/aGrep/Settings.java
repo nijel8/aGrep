@@ -48,12 +48,9 @@ import bg.nijel.aGrep.utils.SnappingLinearLayoutManager;
 
 public class Settings extends Activity implements Result {
 
-   // final static int REQUEST_CODE_ADDDIC = 0x1001;
-
     private static Prefs mPrefs;
     private LinearLayout mExtListView;
     private View.OnLongClickListener mExtListener;
-    private FriendlyImageButton.OnClickListener mSelectAllListener;
     private CompoundButton.OnCheckedChangeListener mCheckListener;
     private ArrayAdapter<String> mRecentAdapter;
     private static Context mContext;
@@ -69,6 +66,7 @@ public class Settings extends Activity implements Result {
     private static LinearLayoutManager mLinearLayoutManager;
     private static boolean mHasItRun = false;
     private static RecyclerView mRecyclerView;
+    private AutoCompleteTextView mSearchEditText;
 
     /** Called when the activity is first created. */
     @Override
@@ -84,7 +82,7 @@ public class Settings extends Activity implements Result {
         mLinearLayoutManager = new SnappingLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         addSellrctAllButton();
-        sortSaveDirsList(null);
+        sortSaveDirsList(null, mPrefs.mDirList);
         mDirectoriesAdapter = new DirectoriesAdapter(mPrefs.mDirList);
         mRecyclerView.setAdapter(mDirectoriesAdapter);
 
@@ -96,11 +94,13 @@ public class Settings extends Activity implements Result {
 
             @Override
             public void onChildViewDetachedFromWindow(View view) {
-                final int lastCompletelyVisibleItemPosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
-                final int itemsCount = mDirectoriesAdapter.getItemCount();
-                if (lastCompletelyVisibleItemPosition <= (itemsCount - 1) && mFabMenuBotom.isMenuButtonHidden()) {
-                    mFabMenuBotom.showMenuButton(true);
-                    RootShell.log("child det    " + (lastCompletelyVisibleItemPosition <= (itemsCount - 1)) + "---" + mFabMenuBotom.isMenuButtonHidden() );
+                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    final int lastCompletelyVisibleItemPosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+                    final int itemsCount = mDirectoriesAdapter.getItemCount();
+                    if (lastCompletelyVisibleItemPosition <= (itemsCount - 1) && mFabMenuBotom.isMenuButtonHidden()) {
+                        mFabMenuBotom.showMenuButton(true);
+                        RootShell.log("child det    " + (lastCompletelyVisibleItemPosition <= (itemsCount - 1)) + "---" + mFabMenuBotom.isMenuButtonHidden());
+                    }
                 }
             }
         });
@@ -227,40 +227,52 @@ public class Settings extends Activity implements Result {
         chkIc.setChecked(mPrefs.mMatchCase);
         chkem.setChecked(mPrefs.mMatchWhole);
 
-        chkRe.setOnClickListener(new View.OnClickListener() {
+        chkRe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mPrefs.mRegularExrpression = chkRe.isChecked();
+                if (chkRe.isChecked()){ //* if using regex we respect user input as is
+                    chkem.setChecked(false);
+                    mPrefs.mMatchWhole = false;
+                }
                 mPrefs.savePrefs(mContext);
             }
         });
         
-        chkem.setOnClickListener(new View.OnClickListener() {
+        chkem.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mPrefs.mMatchWhole = chkem.isChecked();
+                if (chkem.isChecked()){ //* if searching for exact match we ignore regex
+                    chkRe.setChecked(false);
+                    mPrefs.mRegularExrpression = false;
+                }
                 mPrefs.savePrefs(mContext);
             }
         });
         
-        chkIc.setOnClickListener(new View.OnClickListener() {
+        chkIc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mPrefs.mMatchCase = chkIc.isChecked();
                 mPrefs.savePrefs(mContext);
             }
         });
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        final AutoCompleteTextView edittext = (AutoCompleteTextView) findViewById(R.id.EditText01);
-        edittext.setOnKeyListener(new View.OnKeyListener() {
+        mSearchEditText = (AutoCompleteTextView) findViewById(R.id.EditText01);
+        if (SearchTaskActivity.mQuery != null && !SearchTaskActivity.mQuery.isEmpty()) {
+            mSearchEditText.setText(SearchTaskActivity.mQuery);
+        }
+        mSearchEditText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
-                    String text = edittext.getEditableText().toString();
-                    Intent it = new Intent(mContext, Search.class);
+                    String textToSearch = mSearchEditText.getEditableText().toString();
+                   // Intent it = new Intent(mContext, Search.class);
+                    Intent it = new Intent(mContext, SearchTaskActivity.class);
                     it.setAction(Intent.ACTION_SEARCH);
-                    it.putExtra(SearchManager.QUERY, text);
+                    it.putExtra(SearchManager.QUERY, textToSearch);
                     startActivity(it);
                     return true;
                 }
@@ -268,7 +280,7 @@ public class Settings extends Activity implements Result {
             }
         });
         mRecentAdapter = new AutoComleteDropDownAdapter<>(mContext, R.layout.recents_row, new ArrayList<String>());
-        edittext.setAdapter(mRecentAdapter);
+        mSearchEditText.setAdapter(mRecentAdapter);
         final List<String> recent = mPrefs.getRecent(mContext);
         mRecentAdapter.clear();
         mRecentAdapter.addAll(recent);
@@ -278,8 +290,8 @@ public class Settings extends Activity implements Result {
         ImageButton clrBtn = (ImageButton) findViewById(R.id.ButtonClear);
         clrBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                edittext.setText("");
-                edittext.requestFocus();
+                mSearchEditText.setText("");
+                mSearchEditText.requestFocus();
             }
         });
 
@@ -287,11 +299,10 @@ public class Settings extends Activity implements Result {
         searchBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 if (isTargetSelected(mPrefs.mExtList) && isTargetSelected(mPrefs.mDirList)) {
-                    String text = edittext.getText().toString();
-                    if (!text.isEmpty()) {
-                        Intent it = new Intent(mContext, Search.class);
+                    if (!mSearchEditText.getText().toString().isEmpty()) {
+                        Intent it = new Intent(mContext, SearchTaskActivity.class);
                         it.setAction(Intent.ACTION_SEARCH);
-                        it.putExtra(SearchManager.QUERY, text);
+                        it.putExtra(SearchManager.QUERY, mSearchEditText.getText().toString());
                         startActivity(it);
                     } else {
                         Toast.makeText(mContext, R.string.search_text_empty, Toast.LENGTH_LONG).show();
@@ -311,7 +322,7 @@ public class Settings extends Activity implements Result {
         historyBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 if (mPrefs.getRecent(mContext).size() > 0) {
-                    edittext.showDropDown();
+                    mSearchEditText.showDropDown();
                 } else {
                     Toast.makeText(mContext, "No recent history...", Toast.LENGTH_LONG).show();
                 }
@@ -410,7 +421,7 @@ public class Settings extends Activity implements Result {
     }
 
     private void addSellrctAllButton() {
-        mSelectAllListener = new FriendlyImageButton.OnClickListener() {
+        FriendlyImageButton.OnClickListener mSelectAllListener = new FriendlyImageButton.OnClickListener() {
             public void onClick(View view) {
                 if (selectAllBtn.getImageResource() == R.drawable.select_all) {
                     mDirectoriesAdapter.setAllChecked(true);
@@ -440,7 +451,7 @@ public class Settings extends Activity implements Result {
             CheckedString newdir = new CheckedString(dir);
             mPrefs.mDirList.add(newdir);
             mPrefs.mLastSelectedDirectory = dir;
-            final int pos = sortSaveDirsList(newdir);
+            final int pos = sortSaveDirsList(newdir, mPrefs.mDirList);
             mDirectoriesAdapter.notifyItemInserted(pos);
             mRecyclerView.post(new Runnable() {
                 @Override
@@ -474,15 +485,24 @@ public class Settings extends Activity implements Result {
         }
     }
 
-     public static int sortSaveDirsList(CheckedString dir){
-         Collections.sort(mPrefs.mDirList, new Comparator<CheckedString>() {
+     public static int sortSaveDirsList(CheckedString dir, ArrayList<CheckedString> updatedDirList){
+         if (updatedDirList == null){
+             updatedDirList = new ArrayList<>();
+             updatedDirList.addAll(mPrefs.mDirList);
+         }
+         Collections.sort(updatedDirList, new Comparator<CheckedString>() {
              @Override
              public int compare(CheckedString object1, CheckedString object2) {
-
                  return object1.string.substring(object1.string.lastIndexOf("/") + 1, object1.string.length()).compareToIgnoreCase
                          (object2.string.substring(object2.string.lastIndexOf("/") + 1, object2.string.length()));
              }
          });
+         if (!mPrefs.mDirList.equals(updatedDirList)) {
+            // RootShell.log("lists not equals: " + (!mPrefs.mDirList.equals(updatedDirList)));
+             mPrefs.mDirList.clear();
+             mPrefs.mDirList.addAll(updatedDirList);
+         }
+        // RootShell.log("mPrefs.mDirList: " + mPrefs.mDirList.size());
          mPrefs.savePrefs(mContext);
          setSelectAllBtnImage();
          if (dir == null) {
@@ -588,31 +608,45 @@ public class Settings extends Activity implements Result {
 
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+      //  mInputMethodManager.hideSoftInputFromWindow(mAddExtEditText.getWindowToken(), 0);
         if (DialogChooseDirectory.mBrowsingFolder != null) {
             savedInstanceState.putString("browsing_folder", DialogChooseDirectory.mBrowsingFolder);
+            savedInstanceState.putIntArray("current_position", DialogChooseDirectory.mSavedScroll);
         }
         if (mIsExtDialogShow){
             savedInstanceState.putBoolean("ext_dialog_show", true);
             savedInstanceState.putString("add_extension", mAddExtEditText.getText().toString());
         }
-        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
         final List<String> recent = mPrefs.getRecent(mContext);
         mRecentAdapter.clear();
         mRecentAdapter.addAll(recent);
         mRecentAdapter.notifyDataSetChanged();
+        //mSearchText.setText(savedInstanceState.getString("searched_text", ""));
         mIsExtDialogShow = savedInstanceState.getBoolean("ext_dialog_show", false);
         if (DialogChooseDirectory.mBrowsingFolder != null) {
             String path = savedInstanceState.getString("browsing_folder", mPrefs.mLastSelectedDirectory);
+            DialogChooseDirectory.mSavedScroll = savedInstanceState.getIntArray("current_position");
             new DialogChooseDirectory(mContext, (Result) mContext, path);
         }
         if (mIsExtDialogShow){
             addExtension(null);
             mAddExtEditText.setText(savedInstanceState.getString("add_extension", ""));
         }
-        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 }

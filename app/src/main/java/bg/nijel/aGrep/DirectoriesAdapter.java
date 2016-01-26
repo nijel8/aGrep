@@ -36,7 +36,7 @@ public class DirectoriesAdapter extends RecyclerView.Adapter<DirectoriesAdapter.
             dirList.set(i, dirList.get(i).setChecked(checked));
         }
         notifyDataSetChanged();
-        Settings.sortSaveDirsList(null);
+        Settings.sortSaveDirsList(null, dirList);
     }
 
     @Override
@@ -52,7 +52,8 @@ public class DirectoriesAdapter extends RecyclerView.Adapter<DirectoriesAdapter.
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (i < getItemCount()) {
                     dirList.set(i, dir.setChecked(isChecked));
-                    Settings.sortSaveDirsList(dir);
+                   // RootShell.log("dirList: " + dirList.size());
+                    Settings.sortSaveDirsList(dir, dirList);
                 }
             }
         });
@@ -92,7 +93,7 @@ public class DirectoriesAdapter extends RecyclerView.Adapter<DirectoriesAdapter.
             int pos = viewHolder.getAdapterPosition();
             dirList.remove(pos);
             notifyItemRemoved(pos);
-            Settings.sortSaveDirsList(null);
+            Settings.sortSaveDirsList(null, dirList);
         }
     };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
@@ -101,9 +102,9 @@ public class DirectoriesAdapter extends RecyclerView.Adapter<DirectoriesAdapter.
 
     public static class DirectoryViewHolder extends RecyclerView.ViewHolder {
 
-        protected CheckBox dirName;
-        protected TextView dirParent;
-        protected ImageButton openFolder;
+        CheckBox dirName;
+        TextView dirParent;
+        ImageButton openFolder;
 
 
         public DirectoryViewHolder(View v) {

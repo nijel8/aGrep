@@ -7,22 +7,10 @@ package bg.nijel.aGrep.utils;
 import android.content.Context;
 import android.preference.EditTextPreference;
 import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 
 public class FriendlyEditTextPreference extends EditTextPreference {
-
-    private TextView mTitleView;
-
-    public FriendlyEditTextPreference(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
-
-    public FriendlyEditTextPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
 
     public FriendlyEditTextPreference(Context context) {
         super(context);

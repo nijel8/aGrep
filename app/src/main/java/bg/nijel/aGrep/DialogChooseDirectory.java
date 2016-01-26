@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -30,16 +31,17 @@ import java.util.List;
 import bg.nijel.aGrep.utils.RootCommands;
 import me.grantland.widget.AutofitHelper;
 
-public class DialogChooseDirectory implements OnClickListener, OnItemClickListener {
-    AlertDialog m_alertDialog;
-    Context m_context;
-    File m_currentDir;
-    List<File> m_entries = new ArrayList<>();
-    ListView m_list;
-    Result m_result = null;
+class DialogChooseDirectory implements OnClickListener, OnItemClickListener {
+    private AlertDialog m_alertDialog;
+    private Context m_context;
+    private File m_currentDir;
+    private List<File> m_entries = new ArrayList<>();
+    private ListView m_list;
+    private Result m_result = null;
     private Prefs mPrefs;
     private TextView title;
     public static String mBrowsingFolder;
+    public static int[] mSavedScroll;
 
 
     public class DirAdapter extends ArrayAdapter<File> {
@@ -48,7 +50,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
         }
 
         @SuppressWarnings("deprecation")
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, final ViewGroup parent) {
             TextView textview = (TextView) super.getView(position, convertView, parent);
             if (DialogChooseDirectory.this.m_entries.get(position) != null) {
                 textview.setText(DialogChooseDirectory.this.m_entries.get(position).getName());
@@ -57,6 +59,9 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
                 }
                 else {
                     textview.setCompoundDrawablesWithIntrinsicBounds(DialogChooseDirectory.this.m_context.getResources().getDrawable(R.drawable.folder_up), null, null, null);
+                }
+                if (mSavedScroll != null && mSavedScroll[0] > 0) {
+                    m_list.setSelectionFromTop(mSavedScroll[0], mSavedScroll[1]);
                 }
             }
             return textview;
@@ -103,7 +108,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
         this.m_context = ctx;
         this.m_result = res;
         this.mPrefs = Prefs.loadPrefs(this.m_context);
-        this.mBrowsingFolder = startDir;
+        mBrowsingFolder = startDir;
         if (startDir != null) {
             this.m_currentDir = new File(startDir);
         } else {
@@ -129,7 +134,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
             public void onClick(DialogInterface dialog, int id) {
                 new DialogChooseDirectory(DialogChooseDirectory.this.m_context, DialogChooseDirectory.this.m_result, Environment.getExternalStorageDirectory().getAbsolutePath());
                 dialog.dismiss();
-                mBrowsingFolder = null;
+                mBrowsingFolder = Environment.getExternalStorageDirectory().getAbsolutePath();
             }
         });
 
@@ -158,9 +163,23 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
         this.m_list = m_alertDialog.getListView();
         this.m_list.setOnItemClickListener(this);
         m_alertDialog.show();
+        this.m_list.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState == SCROLL_STATE_IDLE) {
+                    saveScrollView(view);
+                }
+            }
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            }
+        });
+        if (mSavedScroll != null && mSavedScroll[0] > 0) {
+            this.m_list.setSelectionFromTop(mSavedScroll[0], mSavedScroll[1]);
+        }
     }
 
-    static public Drawable scaleDrawable(Drawable drawable, int width, int height) {
+    private static Drawable scaleDrawable(Drawable drawable, int width, int height) {
         int wi = drawable.getIntrinsicWidth();
         int hi = drawable.getIntrinsicHeight();
         int dimDiff = Math.abs(wi - width) - Math.abs(hi - height);
@@ -177,6 +196,7 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
                 this.m_currentDir = this.m_currentDir.getParentFile();
             } else {
                 RootShell.log(RootShell.debugTag, "CLICKED" + this.m_entries.get(pos).getAbsolutePath() + "->" + this.m_entries.get(pos).canRead(), RootShell.LogLevel.ERROR, null);
+                saveScrollView(adapterView);
                 this.m_currentDir = this.m_entries.get(pos);
             }
             listDirs();
@@ -185,6 +205,12 @@ public class DialogChooseDirectory implements OnClickListener, OnItemClickListen
             //this.m_alertDialog.setTitle(DialogChooseDirectory.this.m_currentDir.getAbsolutePath());
             this.m_list.setAdapter(new DirAdapter(R.layout.listitem_row_textview));
         }
+    }
+
+    private void saveScrollView(AdapterView<?> adapterView){
+        int first = adapterView.getFirstVisiblePosition();
+        int top = (adapterView.getChildAt(0) == null) ? 0 : (adapterView.getChildAt(0).getTop() - adapterView.getPaddingTop());
+        mSavedScroll = new int[]{first, top};
     }
 
     public void onClick(DialogInterface dialog, int which) {
