@@ -77,7 +77,6 @@ public class TextPreview extends ListView {
                 view.setTextSize(mFontSize);
             }
             CharSequence d = getItem(position);
-//            RootShell.log("query1111 " + d + "~" + mPattern.pattern() + "~");
 
             view.setText( SearchTaskActivity.highlightKeyword( d, mPattern, mFgColor , mBgColor ));
 

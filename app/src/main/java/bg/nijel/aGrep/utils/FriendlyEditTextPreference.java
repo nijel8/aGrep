@@ -22,7 +22,7 @@ public class FriendlyEditTextPreference extends EditTextPreference {
         String text = getText();
         CharSequence summary = super.getSummary();
         if (TextUtils.isEmpty(text)) {
-            return String.format(summary.toString(), text).replace("null", "") + getEditText().getHint();
+            return String.format(summary.toString(), text).replace("null", getEditText().getHint());
         } else {
             summary = super.getSummary();
             if (summary != null) {
